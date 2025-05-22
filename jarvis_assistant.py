@@ -1,7 +1,14 @@
 from assistant.speech import speak, takecommand
 from assistant.helpers import wish, tell_time, tell_date, google_search, tell_ip
 from assistant.email_utils import check_notifications
+from assistant.deepseek import search_deepseek
+from assistant.deepseek import handle_deepseek_search
 
+
+
+
+
+# This is mainly for testing purposes
 def main():
     wish()
     while True:
@@ -13,7 +20,8 @@ def main():
         elif "date" in query:
             speak("Sure, let me check the date for you.")
             tell_date()
-        elif "search" in query:
+        elif "search_on_google" in query or "findongoogle" in query or "search on google" in query:
+            speak("What would you like to search on Google?")
             google_search()
         elif "check_email" in query or "check email" in query or "check notifications" in query:
             speak("Checking for new emails...")
@@ -24,6 +32,10 @@ def main():
         elif "exit" in query or "stop" in query or "shutdown" in query:
             speak("Goodbye, Sir!")
             break
+        if any(phrase in query for phrase in ["search on deep", "search on deekseek", "search on ai"]):
+            # speak("What would you like to search on DeepSeek?")
+            search_query = takecommand()
+            handle_deepseek_search(search_query)
         else:
             speak("I cannot help with that. Please ask something else.")
 
