@@ -3,31 +3,41 @@ from assistant.speech import speak
 from dotenv import load_dotenv
 import os
 
-load_dotenv() 
+load_dotenv()
 
 API_KEY = os.getenv("DEEPSEEK_API_KEY")
-BASE_URL = "https://api.deekseek.com/search"  # hypothetical URL
+BASE_URL = "https://api.deepseek.com/v1/chat/completions"
 
 def search_deepseek(query):
-    params = {
-        "api_key": API_KEY,
-        "q": query
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
     }
-    response = requests.get(BASE_URL, params=params)
+
+    payload = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": query}
+        ],
+        "stream": False
+    }
+
+    response = requests.post(BASE_URL, headers=headers, json=payload)
     print("Status code:", response.status_code)
-    print("Response text:", response.text)   
+    print("Response text:", response.text)
+
     if response.status_code == 200:
         data = response.json()
-        # Parse the response as needed and return useful info
-        return data.get("results", [])
+        # Extract the assistant's reply from the response
+        answer = data["choices"][0]["message"]["content"]
+        return answer
     else:
         return None
 
 def handle_deepseek_search(query):
-    results = search_deepseek(query)
-    if results:
-        # Speak first result or summarize
-        speak(f"Here’s what I found: {results[0]['title']}")
-        # Optionally read more info
+    answer = search_deepseek(query)
+    if answer:
+        speak(f"Here’s what I found: {answer}")
     else:
-        speak("Sorry, I couldn't find anything on DeekSeek.")
+        speak("Sorry, I couldn't find anything on DeepSeek.")
