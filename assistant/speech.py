@@ -7,6 +7,11 @@ engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[0].id)
 
+# Set the speech rate
+# engine.getProperty('rate')
+# engine.setProperty('rate', 190)  
+
+
 
 def speak(audio):
     engine.say(audio)
@@ -41,15 +46,14 @@ def takecommand():
         print(f"User said: {query}")
     except sr.WaitTimeoutError:
         print("Timeout: No speech detected.")
-        speak("Sorry, I didn’t hear anything.")
+        speak("Sorry, I didn’t hear anything. It might be a network issue or I couldn't detect your voice. Please try again.")
         return ""
     except sr.UnknownValueError:
         print("Speech not understood.")
-        speak("Sorry, I didn't understand that.")
+        speak("Sorry, I didn't understand that. Could you please say that again?")
         return ""
     except sr.RequestError as e:
-        print(f"Could not request results; {e}")
-        speak("Sorry, I couldn't reach the speech service.")
+        speak("Sorry, I couldn't reach the speech recognition service. Please check your internet connection and try again.")
         return ""
     except Exception:
         speak("Say that again please...")

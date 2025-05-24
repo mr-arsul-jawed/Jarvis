@@ -11,44 +11,48 @@ from assistant.deepseek import handle_deepseek_search
 
 # This is mainly for testing purposes
 def main():
-
     wish()
-    
+
     while True:
         query = takecommand()
+        query = query.lower()  # Convert once and reuse
 
-        if "time" in query or "current time" in query:
+        if any(phrase in query for phrase in ["time", "current time", "what time is it"]):
             speak("Sure, let me check the time for you.")
             tell_time()
-        elif "date" in query:
+
+        elif any(phrase in query for phrase in ["date", "current date", "what's the current date"]):
             speak("Sure, let me check the date for you.")
             tell_date()
-        elif "search_on_google" in query or "findongoogle" in query or "search on google" in query:
-            # speak("What would you like to search on Google?")
+
+        elif any(phrase in query for phrase in ["search on google", "google search", "find on google"]):
             google_search()
-        elif "check_email" in query or "check email" in query or "check notifications" in query:
+
+        elif any(phrase in query for phrase in ["check email", "check_emails"]):
             speak("Checking for new emails...")
             check_notifications()
-        elif "ip" in query or "ip_address" in query or "fetch ip" in query:
+
+        elif any(phrase in query for phrase in ["fetch ip", "get my ip", "what is my ip", "ip address"]):
             speak("Fetching your IP address...")
             tell_ip()
-        elif "exit" in query or "stop" in query or "shutdown" in query:
-            speak("Goodbye, Sir!")
-            break
 
-        elif "where am i" in query or "where are we" in query:
-           find_me()
+        elif any(phrase in query for phrase in ["where am i", "where are we", "what's my location", "current location", "where are we located"]):
+            find_me()
 
-        elif "read pdf" in query or "pdf reader" in query:
+        elif any(phrase in query for phrase in ["read pdf", "pdf reader", "open pdf"]):
             pdf_reader()
 
-        
-        if any(phrase in query for phrase in ["search on deep", "search on deekseek", "search on ai"]):
-            # speak("What would you like to search on DeepSeek?")
+        elif any(phrase in query for phrase in ["search on deep", "search on deekseek", "search on ai"]):
             search_query = takecommand()
             handle_deepseek_search(search_query)
+
+        elif any(phrase in query for phrase in ["shutdown","goodbye", "sleep"]):
+            speak("Bye, Sir! and take care.")
+            break
+
         else:
             speak("I cannot help with that. Please ask something else.")
+
 
 if __name__ == "__main__":
     main()

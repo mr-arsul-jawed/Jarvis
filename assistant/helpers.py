@@ -7,48 +7,47 @@ import os
 from dotenv import load_dotenv
 import pywhatkit
 import PyPDF2
-
+from assistant.speech import speak, takecommand
 load_dotenv()
 
+
+# Constants
 CITY = "Kolkata"
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
-# print("API Key:", API_KEY)
-
-
 CONTACTS = {
     "shahid": os.getenv("CONTACT_SHAHID")
 
 }
 
 
+
+
 def wish():
-    
+    # Get current time and temperature
+    temp, description = get_temperature(CITY)
+    current_time = datetime.datetime.now().strftime("%I:%M %p")
     hour = int(datetime.datetime.now().hour)
 
+    # Greet based on time
     if 0 <= hour < 12:
-        # greet = "Good morning sir"
-        speak("Good morning sir")
+        speak("Good morning! i'm jarvis.")
     elif 12 <= hour < 15:
-        # greet = "Good afternoon sir"
-        speak("Good afternoon sir")
+        speak("Good afternoon! i'm jarvis.")
     else:
-        # greet = "Good evening sir"
-        speak("Good evening sir")
-    
-    response = takecommand().lower()
-    
-    if response and response != "none":
-        current_time = datetime.datetime.now().strftime("%I:%M %p")
-        speak(f"Sir, it's {current_time}.")
-        temp, description = get_temperature(CITY)
-        if temp is not None:
-          temp_msg = f"The current temperature is {temp} degrees Celsius and today's weather will be {description}."
-          speak(temp_msg)
-        else:
-          speak("Sorry, I couldn't fetch the current temperature.")
-    else:
-     speak("I am Jarvis, sir. Please tell me how I can help you.")
+        speak("Good evening! i'm jarvis.")
 
+    # Speak current time
+    speak(f"Sir, it's {current_time}.")
+
+    # Speak weather info
+    if temp is not None:
+        temp_msg = f"The current temperature is {temp} degrees Celsius and today's weather is {description}."
+        speak(temp_msg)
+    else:
+        speak("Sorry, I couldn't fetch the current temperature.")
+    
+
+ 
 def find_me():
     try:
         speak("Give me a second, let me check where we are.")
@@ -67,7 +66,7 @@ def find_me():
             speak("Would you like me to open this location on Google Maps for you?")
 
             confirm = takecommand().lower()
-            if "yes_open_map" in confirm or "sure" in confirm:
+            if any(phrase in confirm for phrase in ["yes", "open map", "sure", "open it","show me the map"]):
                 webbrowser.open(f"https://www.google.com/maps?q={loc}")
                 speak("I've opened the location in Google Maps.")
             else:
@@ -118,8 +117,6 @@ def send_whatsapp_message():
 def get_temperature(city):
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
     response = requests.get(url)
-    # print("Weather API Status:", response.status_code)
-    # print("Weather API Response:", response.text)
     if response.status_code == 200:
         data = response.json()
         temp = data["main"]["temp"]
