@@ -45,11 +45,11 @@ def takecommand():
         query = r.recognize_google(audio, language='en-in')
         print(f"User said: {query}")
     except sr.WaitTimeoutError:
-        print("Timeout: No speech detected.")
+        # print("Timeout: No speech detected.")
         speak("Sorry, I didn’t hear anything. It might be a network issue or I couldn't detect your voice. Please try again.")
         return ""
     except sr.UnknownValueError:
-        print("Speech not understood.")
+        # print("Speech not understood.")
         speak("Sorry, I didn't understand that. Could you please say that again?")
         return ""
     except sr.RequestError as e:

@@ -78,15 +78,20 @@ def find_me():
         print("Error:", e)
 
 def pdf_reader():
-    book = open(r"C:\Users\arsul\Downloads\websocket.pdf",'rb')
-    pdfReader = PyPDF2.PdfFileReader(book)
-    pages = pdfReader.numPages
+    book = open(r"c:\\Users\arsul\Downloads\websocket.pdf",'rb')
+    # pdfReader = PyPDF2.PdfFileReader(book)
+    pdfReader = PyPDF2.PdfReader(book)
+    # pages = pdfReader.numPages
+    pages = len(pdfReader.pages)
     speak(f"Total numbers of pages in this pdf {pages}")
     speak("Sir, Please enter the page number i have to read")
 
-    pg = int(input("Please enter the page number"))
-    page = pdfReader.getPage(pg)
-    text = page.extractText()
+    pg = int(input("Please enter the page number:___"))
+    # page = pdfReader.getPage(pg)
+    page = pdfReader.pages[pg]
+    speak(f"Reading page number {pg}")
+    # text = page.extractText()
+    text = page.extract_text()
     speak(text)
 
 

@@ -50,8 +50,8 @@ def main():
             speak("Bye, Sir! and take care.")
             break
 
-        else:
-            speak("I cannot help with that. Please ask something else.")
+        # else:
+        #     speak("I cannot help with that. Please ask something else.")
 
 
 if __name__ == "__main__":
