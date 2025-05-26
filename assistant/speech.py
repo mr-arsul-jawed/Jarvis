@@ -35,7 +35,7 @@ def takecommand():
         print("Listening...")
         r.pause_threshold = 1
         try:
-            audio = r.listen(source, timeout=8, phrase_time_limit=8)
+            audio = r.listen(source, timeout=15, phrase_time_limit=15)
         except sr.WaitTimeoutError:
             print("Timeout: No speech detected.")
             speak("Sorry, I didn’t hear anything.")

@@ -1,5 +1,5 @@
 from assistant.speech import speak, takecommand
-from assistant.helpers import wish, tell_time, tell_date, google_search, tell_ip, find_me, pdf_reader
+from assistant.helpers import wish, tell_time, tell_date, google_search, tell_ip, find_me, pdf_reader, search_wikipedia , take_note , read_notes, send_email, system_command, help_menu
 from assistant.email_utils import check_notifications
 from assistant.deepseek import search_deepseek
 from assistant.deepseek import handle_deepseek_search
@@ -46,9 +46,26 @@ def main():
             search_query = takecommand()
             handle_deepseek_search(search_query)
 
-        elif any(phrase in query for phrase in ["shutdown","goodbye", "sleep"]):
+        elif any(phrase in query for phrase in ["shutdown","goodbye", "sleep","shut down jarvis"]):
             speak("Bye, Sir! and take care.")
             break
+        elif any(phrase in query for phrase in ["search on wikipedia", "wikipedia search", "find on wikipedia", "wikipedia", "according to wikipedia"]):
+            search_wikipedia()
+
+        elif any(phrase in query for phrase in ["take a note", "write down", "make a note", "write a note"]):
+            take_note()
+
+        elif any(phrase in query for phrase in ["read note", "read my notes", "show notes", "read my note"]):
+           read_notes()
+
+        elif any(phrase in query for phrase in ["send email", "email", "compose email", "write an email"]):
+            send_email()
+
+        elif any(phrase in query for phrase in ["system command", "run command", "execute command", "command line"]):
+            system_command()
+            
+        elif any(phrase in query for phrase in ["help", "what can you do", "commands", "help me"]):
+            help_menu()
 
         # else:
         #     speak("I cannot help with that. Please ask something else.")

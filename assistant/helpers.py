@@ -9,6 +9,9 @@ import pywhatkit
 import PyPDF2
 from assistant.speech import speak, takecommand
 load_dotenv()
+import wikipedia
+import smtplib
+import urllib.parse
 
 
 # Constants
@@ -130,7 +133,6 @@ def get_temperature(city):
     else:
         return None, None
     
-
 def tell_time():
     time = datetime.datetime.now().strftime("%H:%M:%S")
     speak(f"The current time is {time}")
@@ -146,6 +148,7 @@ def google_search():
         webbrowser.open(f"https://www.google.com/search?q={query}")
         speak(f"Here are the search results for {query}")
 
+
 def tell_ip():
     try:
         ip = get('https://api.ipify.org').text
@@ -153,6 +156,138 @@ def tell_ip():
     except Exception:
         speak("Sorry, I couldn't fetch your IP address right now.")
 
+def search_wikipedia():
+    # speak("What should I search on Wikipedia?")
+    query = takecommand()
+
+    if query and query != "none":
+        speak(f"Searching Wikipedia for {query}...")
+        try:
+            results = wikipedia.summary(query, sentences=2)
+            speak("According to Wikipedia")
+            speak(results)
+        except wikipedia.exceptions.DisambiguationError as e:
+            speak("There are multiple results. Please be more specific.")
+        except wikipedia.exceptions.PageError:
+            speak("Sorry, I couldn't find anything on Wikipedia with that title.")
+        except Exception as e:
+            speak("Sorry, I ran into an error while searching Wikipedia.")
+            print("Wikipedia error:", e)
 
 
+# def get_next_notes_file(folder="Note_file", base_name="notes", ext=".txt"):
+#     # Ensure the folder exists, create if it doesn't
+#     if not os.path.exists(folder):
+#         os.makedirs(folder)
+    
+#     i = 1
+#     while True:
+#         filename = f"{base_name}_{i}{ext}"
+#         filepath = os.path.join(folder, filename)
+#         if not os.path.exists(filepath):
+#             return filepath
+#         i += 1
 
+
+folder_name = "Note_file"
+file_name = "notes_1.txt"
+
+# Create the full path
+NOTES_FILE = os.path.join(os.getcwd(), folder_name, file_name)
+
+def take_note():
+    # NOTES_FILE = get_next_notes_file()
+    speak("What should I write down?")
+    note = takecommand()
+    with open(NOTES_FILE, "a") as f:
+        f.write(note + "\n")
+    speak(f"I've made a note of that in {NOTES_FILE}.")
+
+
+def read_notes():
+    if os.path.exists(NOTES_FILE):
+        with open(NOTES_FILE, "r") as f:
+            content = f.read()
+            if content:
+                speak("Here are your notes.")
+                speak(content)
+            else:
+                speak("You have no notes yet.")
+    else:
+        speak("You have no notes yet.")
+
+
+# def duckduckgo_instant_answer(query):
+#     try:
+#         encoded_query = urllib.parse.quote_plus(query)
+#         url = f"https://api.duckduckgo.com/?q={encoded_query}&format=json"
+#         response = requests.get(url)
+#         data = response.json()
+
+#         if data.get("AbstractText"):
+#             speak(data["AbstractText"])
+#         elif data.get("Definition"):
+#             speak(data["Definition"])
+#         elif data.get("RelatedTopics"):
+#             for topic in data["RelatedTopics"]:
+#                 if isinstance(topic, dict) and topic.get("Text"):
+#                     speak("Here's something I found:")
+#                     speak(topic["Text"])
+#                     break
+#             else:
+#                 speak("Sorry, I couldn't find an instant answer.")
+#         else:
+#             speak("Sorry, I couldn't find an instant answer.")
+#     except Exception as e:
+#         speak("Sorry, something went wrong while searching.")
+#         print("Error:", e)
+
+def send_email(to_email, subject, message, from_email, password, smtp_server="smtp.gmail.com", smtp_port=587):
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(from_email, password)
+        email_message = f"Subject: {subject}\n\n{message}"
+        server.sendmail(from_email, to_email, email_message)
+        server.quit()
+        speak("Email sent successfully.")
+    except Exception as e:
+        speak("Sorry, I couldn't send the email.")
+        print(e)
+
+def system_command(command):
+    command = command.lower()
+    if "open notepad" in command:
+        os.system("notepad")
+        speak("Opening Notepad.")
+    elif "shutdown" in command:
+        speak("Shutting down the system.")
+        os.system("shutdown /s /t 1")
+    elif "screenshot" in command:
+        import pyautogui
+        img = pyautogui.screenshot()
+        img.save("screenshot.png")
+        speak("Screenshot taken and saved.")
+    elif "open youtube" in command:
+        webbrowser.open("https://www.youtube.com")
+        speak("Opening YouTube.")
+    else:
+        speak("Sorry, I don't recognize that system command.")
+    
+def help_menu():
+    commands = """
+    I can help you with these tasks:
+    - Tell time and date
+    - Get weather updates
+    - Search Google or Wikipedia
+    - Play YouTube videos
+    - Send WhatsApp messages
+    - Read PDFs
+    - Take and read notes
+    - Tell jokes and motivational quotes
+    - Set reminders
+    - Send emails
+    - Open Notepad, shutdown, take screenshots
+    Just ask me what you want!
+    """
+    speak(commands)
